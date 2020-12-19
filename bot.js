@@ -14,12 +14,12 @@ client.login(auth.token)
 
 client.on('messageReactionAdd', async (reaction, user) => {
     // // To get unicode emoji do `\:emoji:` and paste here
+    let user_id = reaction.message.author.id
+    let channel = await client.channels.fetch(reaction.message.channel.id)
+    let match = ids.find(o => o.user_id === user_id)
     if (reaction.emoji.name === '😄' ){
         // Starting point
         let start_id = reaction.message.id
-        let user_id = reaction.message.author.id
-        let channel = await client.channels.fetch(reaction.message.channel.id)
-        let match = ids.find(o => o.user_id === user_id)
         if (!match){
             // if we don't find our user ID in there
             ids.push({'start_id':start_id, 'user_id':user_id, 'channel':channel})
@@ -28,6 +28,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             // user id is in there
             match['start_id'] = start_id
         }
+        
     }
 
     if (reaction.emoji.name === '😢'){
@@ -43,7 +44,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             match['end_id'] = end_id
         }
     }
-
+    
     await updateLogs()
     
 })
@@ -138,9 +139,13 @@ async function buildSummary(discussion){
     */
     let new_user=false,code=false
     let first_message = await discussion.channel.messages.fetch(discussion.start_id)
+    // remove reaction
+    first_message.reactions.resolve('😄').users.remove(discussion.user_id)
     let current_user = first_message.username
     // get all messages after
     let messages = await discussion.channel.messages.fetch({"before":discussion.end_id, "after":discussion.start_id})
+    // remove reaction
+    messages.last(1)[0].reactions.resolve('😢').users.remove(discussion.user_id)
     messages = await filterMessages(first_message, messages, discussion.channel)
     
     let message = ""
