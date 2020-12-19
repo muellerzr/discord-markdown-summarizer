@@ -138,14 +138,16 @@ async function buildSummary(discussion){
 
     */
     let new_user=false,code=false
+    // get first message and remove reaction
     let first_message = await discussion.channel.messages.fetch(discussion.start_id)
-    // remove reaction
     first_message.reactions.resolve('😄').users.remove(discussion.user_id)
+    // get last message and remove reaction
+    let last_message = await discussion.channel.messages.fetch(discussion.end_id)
+    last_message.reactions.resolve('😢').users.remove(discussion.user_id)
+
     let current_user = first_message.username
     // get all messages after
     let messages = await discussion.channel.messages.fetch({"before":discussion.end_id, "after":discussion.start_id})
-    // remove reaction
-    messages.last(1)[0].reactions.resolve('😢').users.remove(discussion.user_id)
     messages = await filterMessages(first_message, messages, discussion.channel)
     
     let message = ""
