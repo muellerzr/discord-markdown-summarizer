@@ -1,8 +1,10 @@
+// External libraries
 const Discord = require('discord.js')
-const client = new Discord.Client()
-const auth = require('./auth.json')
 const clipboardy = require('clipboardy')
 
+const client = new Discord.Client()
+
+const auth = require('./auth.json')
 const ids = []
 
 client.on('ready', () => {
