@@ -19,14 +19,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
         let start_id = reaction.message.id
         let user_id = reaction.message.author.id
         let channel = await client.channels.fetch(reaction.message.channel.id)
-        if (!ids.find(o => o.user_id === user_id)){
+        let match = ids.find(o => o.user_id === user_id)
+        if (!match){
             // if we don't find our user ID in there
             ids.push({'start_id':start_id, 'user_id':user_id, 'channel':channel})
         }
         else{
             // user id is in there
-            let idx = ids.findIndex(o => o.user_id === user_id)
-            ids[idx]['start_id'] = start_id
+            match['start_id'] = start_id
         }
     }
 
@@ -34,14 +34,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
         // End
         let end_id = reaction.message.id
         let user_id = reaction.message.author.id
-        if (!ids.find(o => o.user_id === user_id)){
+        if (!match){
             // if we don't find our user ID in there
             ids.push({'end_id':end_id, 'user_id':user_id, 'channel':channel})
         }
         else{
             // user id is in there
-            let idx = ids.findIndex(o => o.user_id === user_id)
-            ids[idx]['end_id'] = end_id
+            match['end_id'] = end_id
         }
     }
 
@@ -70,7 +69,7 @@ async function filterMessages(first_message, messages, channel){
     for (message of messages){
         if (message.attachments){
             for (attachment of message.attachments){
-                let url_string = `![]${attachment.url}`
+                let url_string = `\n![](${attachment[1]['url']})`
                 filtered.push({
                     'username':first_message.author.username, 
                     'content':url_string, 
