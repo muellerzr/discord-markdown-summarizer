@@ -51,6 +51,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 })
 
 async function filterMessages(first_message, messages, channel){
+    // Filter function to check if there are any quotes and multiple lines
     filtered = []
     for (message of first_message.content.split('\n')){
         filtered.push({'username':first_message.author.username, 'content':message, 'timestamp':first_message.createdTimestamp})
@@ -83,6 +84,10 @@ async function filterMessages(first_message, messages, channel){
 }
 
 async function updateLogs(){
+    // Checks if we have a start_id and end_id on any messages
+    // If so copy message, attach as markdown, and send to the user
+    // Also pop from array
+    // Messages are sent as `summary_month_day_year.md`
     for (let i = 0; i < ids.length; i++){
         let id = ids[i]
         if (id.start_id && id.end_id){
