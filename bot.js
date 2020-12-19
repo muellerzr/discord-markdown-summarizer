@@ -1,6 +1,5 @@
 // External libraries
 const Discord = require('discord.js')
-const clipboardy = require('clipboardy')
 
 const client = new Discord.Client()
 
@@ -53,12 +52,32 @@ client.on('messageReactionAdd', async (reaction, user) => {
 async function filterMessages(first_message, messages, channel){
     // Filter function to check if there are any quotes and multiple lines
     filtered = []
+    if (first_message.attachments){
+        for (attachment of first_message.attachments){
+            let url_string = `\n![](${attachment[1]['url']})`
+            filtered.push({'username':first_message.author.username, 'content':url_string, 'timestamp':first_message.createdTimestamp})
+        }
+    }
     for (message of first_message.content.split('\n')){
-        filtered.push({'username':first_message.author.username, 'content':message, 'timestamp':first_message.createdTimestamp})
+        filtered.push({
+            'username':first_message.author.username, 
+            'content':message, 
+            'timestamp':first_message.createdTimestamp
+        })
     }
 
     messages = messages.array()
     for (message of messages){
+        if (message.attachments){
+            for (attachment of message.attachments){
+                let url_string = `![]${attachment.url}`
+                filtered.push({
+                    'username':first_message.author.username, 
+                    'content':url_string, 
+                    'timestamp':first_message.createdTimestamp
+                })
+            }
+        }
         for (sub_message of message.content.split('\n')){
             if (message.reference){
                 let reference = await channel.messages.fetch(message.reference.messageID)
@@ -100,7 +119,7 @@ async function updateLogs(){
             let mm = String(today.getMonth() + 1).padStart(2, '0')
             let yyyy = today.getFullYear()
             let attachment = new Discord.MessageAttachment(buff, `summary_${mm}_${dd}_${yyyy}.md`)
-            await user.send("Your topic summary has been copied to your clipboard!\nYou can now post it to https://forums.fast.ai if you would like\nIn case you need it again here is a markdown copy", attachment)
+            await user.send("Your topic summary is attached!\nYou can now post it to https://forums.fast.ai if you would like", attachment)
             ids.splice(i, 1)
             break
         }
