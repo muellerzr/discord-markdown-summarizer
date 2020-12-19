@@ -111,7 +111,6 @@ async function updateLogs(){
         let id = ids[i]
         if (id.start_id && id.end_id){
             let message = await buildSummary(id)
-            clipboardy.writeSync(message)
             let user = await client.users.fetch(id.user_id)
             let buff = Buffer.from(message)
             let today = new Date()
